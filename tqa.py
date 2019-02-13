@@ -7,94 +7,94 @@ import datetime
 
 client_id = ''
 client_key = ''
-baseURL = 'https://tqa.imageowl.com/api/rest'
-oauthExt = '/oauth'
-grantType = 'client_credentials'
-accessToken = ''
-tokenDuration = 0
-tokenType = ''
-tokenExpirationTime = ''
-tokenExpirationMargin = 0.9
+base_url = 'https://tqa.imageowl.com/api/rest'
+oauth_ext = '/oauth'
+grant_type = 'client_credentials'
+access_token = ''
+token_duration = 0
+token_type = ''
+token_exp_time = ''
+token_exp_margin = 0.9
 
-def setTQAToken():
+def set_tqa_token():
     
         payload = {"client_id": client_id,
                    "client_secret": client_key,
-                   "grant_type": grantType}
+                   "grant_type": grant_type}
 
-        requestURL = baseURL + oauthExt
-        r = requests.post(requestURL ,data = payload)
+        request_url = base_url + oauth_ext
+        r = requests.post(request_url ,data = payload)
 
         j = r.json()
-        global accessToken
-        accessToken = j['access_token']
+        global access_token
+        access_token = j['access_token']
         
-        global tokenDuration
-        tokenDuration = j['expires_in']
+        global token_duration
+        token_duration = j['expires_in']
         
-        global tokenType
-        tokenType = j['token_type']
+        global token_type
+        token_type = j['token_type']
 
-        global tokenExpirationTime
-        tokenExpirationTime = datetime.datetime.now()+datetime.timedelta(seconds=tokenDuration)
+        global token_exp_time
+        token_exp_time = datetime.datetime.now()+datetime.timedelta(seconds=token_duration)
 
     
 
-def loadCredentialsFromJSON(credentialFile):
-        with open(credentialFile) as credFile:
-                cred = json.load(credFile)
+def load_json_credentials(credential_file):
+        with open(credential_file) as cred_file:
+                cred = json.load(cred_file)
                 tqaCred = cred['TQACredentials']
                 
-                global clientID
-                clientID = tqaCred['ClientID']
+                global client_id
+                client_id = tqaCred['client_id']
 
-                global baseURL
-                baseURL = tqaCred['BaseURL']
+                global base_url
+                base_url = tqaCred['base_url']
 
-                global oauthExt
-                oauthExt = tqaCred['OauthURL']
+                global oauth_ext
+                oauth_ext = tqaCred['OauthURL']
 
-                keyBytes = base64.b64decode(tqaCred['APIKey'])
+                key_bytes = base64.b64decode(tqaCred['APIKey'])
                 global client_key
-                client_key = keyBytes.decode('UTF-8')
+                client_key = key_bytes.decode('UTF-8')
 
-                setTQAToken()
+                set_tqa_token()
                 
 
-def getStandardHeaders():
-        if accessToken == '':
-                setTQAToken()
+def get_standard_headers():
+        if access_token == '':
+                set_tqa_token()
         else:
-                closeTimeDelta = datetime.timedelta(seconds =(1-tokenExpirationMargin)*tokenDuration)
-                if datetime.datetime.now() > tokenExpirationTime - closeTimeDelta:
-                        setTQAToken()
+                close_time_delta = datetime.timedelta(seconds =(1-token_exp_margin)*token_duration)
+                if datetime.datetime.now() > token_exp_time - close_time_delta:
+                        set_tqa_token()
 
-        bearerToken = 'Bearer ' + accessToken
+        bearer_token = 'Bearer ' + access_token
         headers = {
-            'authorization': bearerToken,
+            'authorization': bearer_token,
             'content-type': "application/json",
             'accept': "application/json",
         }
         return headers
 
-def getRequest(urlExt):
-        url = baseURL + urlExt
-        response = requests.request("GET",url,headers = getStandardHeaders())
+def get_request(url_ext):
+        url = base_url + url_ext
+        response = requests.request("GET",url,headers = get_standard_headers())
         
         return {'json':response.json(),
                 'status':response.status_code,
                 'raw':response}
 
-def getSites():
-        return getRequest('/sites')
+def get_sites():
+        return get_request('/sites')
 
-def getUsers(userID = -1):
-        if userID == -1:
-                return getRequest('/users')
+def get_users(user_id = -1):
+        if user_id == -1:
+                return get_request('/users')
         else:
-                return getRequest('/users/'+str(userID))
+                return get_request('/users/'+str(user_id))
 
-def getMachines(active = -1,site = -1, deviceType = -1):
+def get_machines(active = -1,site = -1, device_type = -1):
         #build the filter
         filter = ''
         if not active == -1:
@@ -104,18 +104,18 @@ def getMachines(active = -1,site = -1, deviceType = -1):
                 if len(filter) > 0: filter += '&'
                 filter = filter + 'site=' + str(site)
 
-        if not deviceType == -1:
+        if not device_type == -1:
                 if len(filter) > 0: filter += '&'
-                filter = filter + 'deviceType=' + str(deviceType)
+                filter = filter + 'device_type=' + str(device_type)
 
         if len(filter) > 0: filter = '?' + filter
 
-        urlExt = '/machines'+filter
+        url_ext = '/machines'+filter
         
-        return getRequest(urlExt)
+        return get_request(url_ext)
 
-def getReportData(reportId):
-        return getRequest('/report-data/'+str(reportId))
+def get_report_data(report_id):
+        return get_request('/report-data/'+str(report_id))
 
         
 

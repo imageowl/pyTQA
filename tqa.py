@@ -5,21 +5,21 @@ import json
 import base64
 import datetime
 
-clientID = '';
-clientKey = '';
+client_id = ''
+client_key = ''
 baseURL = 'https://tqa.imageowl.com/api/rest'
 oauthExt = '/oauth'
 grantType = 'client_credentials'
 accessToken = ''
-tokenDuration = 0;
-tokenType = '';
+tokenDuration = 0
+tokenType = ''
 tokenExpirationTime = ''
 tokenExpirationMargin = 0.9
 
 def setTQAToken():
     
-        payload = {"client_id": clientID,
-                   "client_secret": clientKey,
+        payload = {"client_id": client_id,
+                   "client_secret": client_key,
                    "grant_type": grantType}
 
         requestURL = baseURL + oauthExt
@@ -55,8 +55,8 @@ def loadCredentialsFromJSON(credentialFile):
                 oauthExt = tqaCred['OauthURL']
 
                 keyBytes = base64.b64decode(tqaCred['APIKey'])
-                global clientKey
-                clientKey = keyBytes.decode('UTF-8')
+                global client_key
+                client_key = keyBytes.decode('UTF-8')
 
                 setTQAToken()
                 

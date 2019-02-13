@@ -8,8 +8,8 @@ import datetime
 client_id = ''
 client_key = ''
 base_url = 'https://tqa.imageowl.com/api/rest'
-oauth_ext = '/oauth'
-grant_type = 'client_credentials'
+_oauth_ext = '/oauth'
+_grant_type = 'client_credentials'
 access_token = ''
 token_duration = 0
 token_type = ''
@@ -20,9 +20,9 @@ def set_tqa_token():
     
         payload = {"client_id": client_id,
                    "client_secret": client_key,
-                   "grant_type": grant_type}
+                   "grant_type": _grant_type}
 
-        request_url = base_url + oauth_ext
+        request_url = base_url + _oauth_ext
         r = requests.post(request_url ,data = payload)
 
         j = r.json()
@@ -51,8 +51,8 @@ def load_json_credentials(credential_file):
                 global base_url
                 base_url = tqaCred['base_url']
 
-                global oauth_ext
-                oauth_ext = tqaCred['OauthURL']
+                global _oauth_ext
+                _oauth_ext = tqaCred['OauthURL']
 
                 key_bytes = base64.b64decode(tqaCred['APIKey'])
                 global client_key

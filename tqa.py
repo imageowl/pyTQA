@@ -46,10 +46,10 @@ def load_json_credentials(credential_file):
                 tqaCred = cred['TQACredentials']
                 
                 global client_id
-                client_id = tqaCred['client_id']
+                client_id = tqaCred['ClientID']
 
                 global base_url
-                base_url = tqaCred['base_url']
+                base_url = tqaCred['BaseURL']
 
                 global _oauth_ext
                 _oauth_ext = tqaCred['OauthURL']

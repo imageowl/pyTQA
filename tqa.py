@@ -117,8 +117,23 @@ def get_machines(active = -1,site = -1, device_type = -1):
 def get_report_data(report_id):
         return get_request('/report-data/'+str(report_id))
 
-        
 
+def upload_analysis_file(schedule_id,file_path):
+        headers = get_standard_headers()
+        #remove the content-type for this call
+        del headers['content-type']
+        url_ext = ''.join(['/schedules/',str(schedule_id),'/upload-images'])
+        url = ''.join([base_url,url_ext])
+        files = [
+            ('file',(file_path,open(file_path,'rb'),'application/octet-stream'))
+            ]
+        return requests.post( url, headers=headers, data = {}, files = files)
+
+def start_processing(schedule_id):
+        headers = get_standard_headers()
+        url_ext = ''.join(['/schedules/',str(schedule_id),'/start-processing'])
+        url_process = ''.join([base_url,url_ext])
+        return requests.post( url_process, headers=headers, data = {})
 
 
 

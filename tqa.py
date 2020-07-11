@@ -59,7 +59,24 @@ def load_json_credentials(credential_file):
                 client_key = key_bytes.decode('UTF-8')
 
                 set_tqa_token()
-                
+     
+def save_json_credentials(credential_file):
+    #encode the key in base 64
+    key_bytes = client_key.encode('UTF-8')
+    key_bytes_b64 = base64.b64encode(key_bytes)
+    base64_key = key_bytes_b64.decode('UTF-8')
+
+    cred_info = {
+        "ClientID":client_id,
+        "APIKey": base64_key,
+        "BaseURL": base_url,
+        "OauthURL": _oauth_ext}
+    
+    tqa_cred_dict = {"TQACredentials":cred_info}
+
+    json_out_file = open(credential_file, "w")
+    json_out_file.write(json.dumps(tqa_cred_dict, indent=4, sort_keys=True))
+    json_out_file.close()
 
 def get_standard_headers():
         if access_token == '':

@@ -135,8 +135,14 @@ def start_processing(schedule_id):
         url_process = ''.join([base_url,url_ext])
         return requests.post( url_process, headers=headers, data = {})
 
+def finalize_report(schedule_id):
+        headers = get_standard_headers()
+        url_ext = ''.join(['/schedules/',str(schedule_id),'/finalize-results'])
+        url_process = ''.join([base_url,url_ext])
+        return requests.post( url_process, headers=headers, data = {})        
 
-
+def get_upload_status(schedule_id):
+        return get_request(''.join(['/schedules/',str(schedule_id),'/upload-images']))
 
         
                 

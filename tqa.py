@@ -130,6 +130,18 @@ def get_machines(active = -1,site = -1, device_type = -1):
         url_ext = '/machines'+filter
         
         return get_request(url_ext)
+        
+def get_machine_id_from_str(find_machines):
+        #if a simple str is passed then convert to a list
+        if type(find_machines) == str:
+                find_machines = [find_machines]
+        
+        machines = get_machines()
+        machine_names = [m['name'] for m in machines['json']['machines']]
+        machine_ids = [m['id'] for m in machines['json']['machines']]
+        res = [i for i, val in enumerate(machine_names) if any(m in val for m in find_machines)] 
+        return [machine_ids[i] for i in res]
+        
 
 def get_report_data(report_id):
         return get_request('/report-data/'+str(report_id))

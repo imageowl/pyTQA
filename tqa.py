@@ -16,6 +16,7 @@ token_type = ''
 token_exp_time = ''
 token_exp_margin = 0.9
 
+
 def set_tqa_token():
     
         payload = {"client_id": client_id,
@@ -94,13 +95,17 @@ def get_standard_headers():
         }
         return headers
 
-def get_request(url_ext):
-        url = base_url + url_ext
+def get_request(url_ext, raw_url = False):
+        if raw_url:
+            url = url_ext
+        else:
+            url = base_url + url_ext
         response = requests.request("GET",url,headers = get_standard_headers())
         
         return {'json':response.json(),
                 'status':response.status_code,
                 'raw':response}
+                                
 
 def get_sites():
         return get_request('/sites')
@@ -172,14 +177,52 @@ def finalize_report(schedule_id):
 
 def get_upload_status(schedule_id):
         return get_request(''.join(['/schedules/',str(schedule_id),'/upload-images']))
+        
+
+def get_reports(**kwargs):
+        param_keys = ['machine','site','schedule','status','toleranceStatus',
+        'deviceType','frequency']
+        
+        param = {}
+        for p in param_keys:
+                param[p] = -1
+        
+        param.update(**kwargs)
+        
+        #build the filter
+        filter = ''
+        
+        for p in param_keys:       
+
+                if not param[p] == -1:
+                        if len(filter) > 0: 
+                                filter += '&'
+                        filter += "{}={}".format(p,str(param[p]))
 
         
+        if len(filter) > 0: filter = '?{}'.format(filter)
+        
+        url_ext = "/reports{}".format(filter)
+        
+        #get the initial report response
+        reports = [];
+        rep_response = get_request(url_ext)
+        rep_json = rep_response["json"]
+        
+        if "reports" in rep_json.keys() and len(rep_json["reports"]) > 0:
+                reports.extend(rep_json["reports"])
+                #now see if there are further pages
+                while ("_metadata" in rep_json.keys() and
+                "Links" in rep_json["_metadata"].keys() and
+                "next" in rep_json["_metadata"]["Links"].keys() and
+                len(rep_json["_metadata"]["Links"]["next"]) > 0):
+                        print(rep_json["_metadata"]["Links"]["next"])
+                        rep_response = get_request(rep_json["_metadata"]["Links"]["next"],True)
+                        rep_json = rep_response["json"]
+                        if "reports" in rep_json.keys() and len(rep_json["reports"]) > 0:
+                                reports.extend(rep_json["reports"])
                 
-
-
-
-
-
         
-    
-    
+        return reports
+        
+        

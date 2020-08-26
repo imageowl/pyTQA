@@ -146,7 +146,100 @@ def get_machine_id_from_str(find_machines):
         machine_ids = [m['id'] for m in machines['json']['machines']]
         res = [i for i, val in enumerate(machine_names) if any(m in val for m in find_machines)] 
         return [machine_ids[i] for i in res]
-        
+
+
+def get_equipment(equipment_id = -1):
+        if equipment_id == -1:
+                return get_request('/equipment')
+        else:
+                return get_request('/equipment/'+str(equipment_id))
+
+
+def get_templates(template_id = -1):
+        if template_id == -1:
+                return get_request('/templates')
+        else:
+                return get_request('/templates/'+str(template_id))
+
+
+def get_schedules(schedule_id = -1):
+        if schedule_id == -1:
+                return get_request('/schedules')
+        else:
+                return get_request('/schedules/'+str(schedule_id))
+
+
+def get_schedule_id_from_str(schedule_name, machine_idx = -1):
+        if machine_idx == -1:
+                raise Warning('Possible_Ambiguous_Results', 'Not specifying a machine id may result in'
+                                                            'ambiguous results')
+
+        # if a simple str is passed then convert to a list
+        if type(schedule_name) == str:
+                schedule_name = [schedule_name]
+
+        # all schedules
+        schedules = get_schedules()
+        schedule_names = [s['name'] for s in schedules['json']['schedules']]
+        schedule_ids = [s['id'] for s in schedules['json']['schedules']]
+        res = [i for i, val in enumerate(schedule_names) if any(s in val for s in schedule_name)]
+        # schedule ids of schedules with parameter name
+        res_ids = [schedule_ids[i] for i in res]
+
+        for idx, val in enumerate(schedules['json']['schedules']):
+                machine = schedules['json']['schedules'][idx]['machineId']
+                sched = schedules['json']['schedules'][idx]['id']
+                if machine == machine_idx and sched in res_ids:
+                        return sched
+        return 'No schedules found with that id for specified machine id'
+
+
+def get_custom_tests():
+        return get_request('/custom-tests')
+
+
+def get_baselines_and_tolerances(schedule_id):
+        return get_request('/schedules/'+str(schedule_id)+'/tolerances')
+
+
+def get_documents(document_id = -1):
+        if document_id == -1:
+                return get_request('/documents')
+        else:
+                return get_request('/documents/'+str(document_id))
+
+
+def get_machine_energies():
+        return get_request('/machine-energies')
+
+
+def get_qa_settings(schedule_id):
+        return get_request('/schedules/'+str(schedule_id)+'/qa-settings')
+
+
+def get_schedule_variables(schedule_id):
+        return get_request('/schedules/'+str(schedule_id)+'/variables')
+
+
+def get_variable_id_from_string(var_name, schedule_idx):
+        schedule_vars = get_schedule_variables(schedule_idx)
+
+        if len(schedule_vars) == 0:
+                return 'The list of variables is empty'
+
+        # if a simple str is passed then convert to a list
+        if type(var_name) == str:
+                var_name = [var_name]
+
+        variable_names = [v['name'] for v in schedule_vars['json']['variables']]
+        variable_ids = [v['id'] for v in schedule_vars['json']['variables']]
+        res = [i for i, val in enumerate(variable_names) if any(m in val for m in var_name)]
+        return [variable_ids[i] for i in res]
+
+
+def get_tests():
+        return get_request('/tests')
+
 
 def get_report_data(report_id):
         return get_request('/report-data/'+str(report_id))

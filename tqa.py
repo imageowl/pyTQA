@@ -144,7 +144,13 @@ def get_machine_id_from_str(find_machines):
         machines = get_machines()
         machine_names = [m['name'] for m in machines['json']['machines']]
         machine_ids = [m['id'] for m in machines['json']['machines']]
-        res = [i for i, val in enumerate(machine_names) if any(m in val for m in find_machines)] 
+        res = [i for i, val in enumerate(machine_names) if any(m in val for m in find_machines)]
+
+        for i in res:
+                # if string exactly matches a machine name
+                if machine_names[i] == find_machines[0]:
+                        return machine_ids[i]
+
         return [machine_ids[i] for i in res]
 
 

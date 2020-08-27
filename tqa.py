@@ -165,6 +165,12 @@ def get_templates(template_id = -1):
         if template_id == -1:
                 return get_request('/templates')
         else:
+                templates = get_templates()
+                template_ids = [t['id'] for t in templates['json']['templates']]
+                for idx, t in enumerate(template_ids):
+                        if t == template_id:
+                                return templates['json']['templates'][idx]
+                # get_request not working
                 return get_request('/templates/'+str(template_id))
 
 

@@ -257,6 +257,40 @@ def get_report_data(report_id):
         return get_request('/report-data/'+str(report_id))
 
 
+
+def get_longitudinal_data(schedule_id, variable_ids = -1, date_start = -1, date_end = -1, date_format = -1):
+        params = ''
+        if variable_ids != -1:
+                if isinstance(variable_ids, int) == 1:
+                        params = params + 'variables=' + str(variable_ids)
+                elif len(variable_ids) == 1:
+                        params = params + 'variables=' + str(variable_ids[0])
+                else:
+                        params += 'variables='
+                        for v in variable_ids:
+                                params = params + str(v) + ','
+                        params = params[:-1]
+
+        if date_start != -1:
+                if len(params) > 0:
+                        params += '&'
+                params = params + 'dateFrom=' + str(date_start)
+
+        if date_end != -1:
+                if len(params) > 0:
+                        params += '&'
+                params = params + 'dateTo=' + str(date_end)
+
+        # if date_format != -1:
+
+        if len(params) > 0:
+                params = '?' + params
+
+        url_ext = '/schedules/'+str(schedule_id)+'/trends'+params
+
+        return get_request(url_ext)
+
+
 def upload_analysis_file(schedule_id,file_path):
         headers = get_standard_headers()
         #remove the content-type for this call

@@ -4,6 +4,7 @@ import requests
 import json
 import base64
 import datetime
+from dateutil import parser
 
 client_id = ''
 client_key = ''
@@ -271,17 +272,22 @@ def get_longitudinal_data(schedule_id, variable_ids = -1, date_start = -1, date_
                                 params = params + str(v) + ','
                         params = params[:-1]
 
+        if date_format == -1:
+                date_format = 'YYYY-mm-ddThh:mm'
+
         if date_start != -1:
                 if len(params) > 0:
                         params += '&'
-                params = params + 'dateFrom=' + str(date_start)
+                dStart = getDateFromString(date_start, date_format)
+                params = params + 'dateFrom=' + str(dStart)
 
         if date_end != -1:
                 if len(params) > 0:
                         params += '&'
-                params = params + 'dateTo=' + str(date_end)
+                dEnd = getDateFromString(date_end, date_format)
+                params = params + 'dateTo=' + str(dEnd)
 
-        # if date_format != -1:
+
 
         if len(params) > 0:
                 params = '?' + params
@@ -289,6 +295,15 @@ def get_longitudinal_data(schedule_id, variable_ids = -1, date_start = -1, date_
         url_ext = '/schedules/'+str(schedule_id)+'/trends'+params
 
         return get_request(url_ext)
+
+
+def getDateFromString(date_str, date_format = -1):
+        if date_format == -1:
+                # no format specified
+                dt = parser.parse(date_str)
+        else:
+                dt = datetime.datetime.strptime(date_str, date_format)
+        return dt
 
 
 def upload_analysis_file(schedule_id,file_path):

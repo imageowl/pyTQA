@@ -272,9 +272,6 @@ def get_longitudinal_data(schedule_id, variable_ids = -1, date_start = -1, date_
                                 params = params + str(v) + ','
                         params = params[:-1]
 
-        if date_format == -1:
-                date_format = 'YYYY-mm-ddThh:mm'
-
         if date_start != -1:
                 if len(params) > 0:
                         params += '&'
@@ -286,8 +283,6 @@ def get_longitudinal_data(schedule_id, variable_ids = -1, date_start = -1, date_
                         params += '&'
                 dEnd = getDateFromString(date_end, date_format)
                 params = params + 'dateTo=' + str(dEnd)
-
-
 
         if len(params) > 0:
                 params = '?' + params
@@ -303,6 +298,8 @@ def getDateFromString(date_str, date_format = -1):
                 dt = parser.parse(date_str)
         else:
                 dt = datetime.datetime.strptime(date_str, date_format)
+
+        dt = dt.strftime('%Y-%m-%dT%H:%M')
         return dt
 
 

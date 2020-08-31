@@ -304,18 +304,18 @@ def get_date_from_string(date_str, date_format = -1):
 
 def upload_test_results(schedule_id, variable_data, comment = -1, finalize = -1, date = -1, date_format = -1):
         # upload test results to a schedule
-        parse_upload_simple_data_input(schedule_id, variable_data, comment,
-                                                                          finalize, date, date_format)
+        dt_format, schedule_id, output_data = parse_upload_simple_data_input(schedule_id, variable_data, comment,
+                                                                               finalize, date, date_format)
 
         urlExt = '/schedules/'+str(schedule_id)+'/add-results'
-
-        # return requests.post(urlExt, jsonData, format)
-        return 'done'
+        url = base_url + urlExt
+        jsonData = json.dumps(output_data)
+        return requests.post(url, data=jsonData)
 
 
 def parse_upload_simple_data_input(schedule_id, variable_data, comment, finalize, date, date_format):
-        if isinstance(variable_data, dict): # then assume its a single measurement
-                variable_data = [variable_data]
+        # if isinstance(variable_data, dict):  # then assume its a single measurement
+        #         variable_data = [variable_data]
 
         if len(variable_data) == 0:
                 variable_data = ['EMPTY']
@@ -327,8 +327,14 @@ def parse_upload_simple_data_input(schedule_id, variable_data, comment, finalize
                 else:
                         dt = datetime.datetime.strptime(date, date_format)
                 dt = dt.strftime('%Y-%m-%dT%H:%M')
+        else:
+                dt = ''
 
-        for v in range(variable_data):
+        for v in variable_data.values():
+                print(variable_data)
+                print('\n')
+                print(v[0])
+                v = v[0]
                 # all must have at least id and value
                 if 'id' not in v or 'value' not in v:
                         raise ValueError('TQAConnection:parse_upload_simple_data_input',
@@ -348,7 +354,7 @@ def parse_upload_simple_data_input(schedule_id, variable_data, comment, finalize
                                         if 'id' not in m or 'value' not in m:
                                                 raise ValueError('TQAConnection:parse_upload_simple_data_input',
                                                                  'metaItem data must have id and value fields')
-
+        return dt, schedule_id, variable_data
 
 
 def upload_analysis_file(schedule_id,file_path):

@@ -19,7 +19,7 @@ token_exp_margin = 0.9
 
 
 def set_tqa_token():
-    
+
         payload = {"client_id": client_id,
                    "client_secret": client_key,
                    "grant_type": _grant_type}
@@ -30,23 +30,23 @@ def set_tqa_token():
         j = r.json()
         global access_token
         access_token = j['access_token']
-        
+
         global token_duration
         token_duration = j['expires_in']
-        
+
         global token_type
         token_type = j['token_type']
 
         global token_exp_time
         token_exp_time = datetime.datetime.now()+datetime.timedelta(seconds=token_duration)
 
-    
+
 
 def load_json_credentials(credential_file):
         with open(credential_file) as cred_file:
                 cred = json.load(cred_file)
                 tqaCred = cred['TQACredentials']
-                
+
                 global client_id
                 client_id = tqaCred['ClientID']
 
@@ -61,7 +61,7 @@ def load_json_credentials(credential_file):
                 client_key = key_bytes.decode('UTF-8')
 
                 set_tqa_token()
-     
+
 def save_json_credentials(credential_file):
     #encode the key in base 64
     key_bytes = client_key.encode('UTF-8')
@@ -73,7 +73,7 @@ def save_json_credentials(credential_file):
         "APIKey": base64_key,
         "BaseURL": base_url,
         "OauthURL": _oauth_ext}
-    
+
     tqa_cred_dict = {"TQACredentials":cred_info}
 
     json_out_file = open(credential_file, "w")
@@ -102,11 +102,11 @@ def get_request(url_ext, raw_url = False):
         else:
             url = base_url + url_ext
         response = requests.request("GET",url,headers = get_standard_headers())
-        
+
         return {'json':response.json(),
                 'status':response.status_code,
                 'raw':response}
-                                
+
 
 def get_sites():
         return get_request('/sites')
@@ -134,14 +134,14 @@ def get_machines(active = -1,site = -1, device_type = -1):
         if len(filter) > 0: filter = '?' + filter
 
         url_ext = '/machines'+filter
-        
+
         return get_request(url_ext)
-        
+
 def get_machine_id_from_str(find_machines):
         #if a simple str is passed then convert to a list
         if type(find_machines) == str:
                 find_machines = [find_machines]
-        
+
         machines = get_machines()
         machine_names = [m['name'] for m in machines['json']['machines']]
         machine_ids = [m['id'] for m in machines['json']['machines']]
@@ -328,7 +328,26 @@ def parse_upload_simple_data_input(schedule_id, variable_data, comment, finalize
                         dt = datetime.datetime.strptime(date, date_format)
                 dt = dt.strftime('%Y-%m-%dT%H:%M')
 
+        for v in range(variable_data):
+                # all must have at least id and value
+                if 'id' not in v or 'value' not in v:
+                        raise ValueError('TQAConnection:parse_upload_simple_data_input',
+                                         'each element of the variable data must have id and value fields')
 
+                # they MAY have a metaItems field in which case each metaitem must have an id and value
+                if 'metaItems' in v:
+                        if isinstance(v['metaItems'], dict):
+                                # all must have at least id and value
+                                if 'id' not in v['metaItems'] or 'value' not in v['metaItems']:
+                                        raise ValueError('TQAConnection:parse_upload_simple_data_input',
+                                                         'metaItem data must have id and value fields')
+                                # if len(v['metaItems']) == 1:
+                        elif isinstance(v['metaItems'], list):
+                                for m in v['metaItems']:
+                                        # all must have at least id and value
+                                        if 'id' not in m or 'value' not in m:
+                                                raise ValueError('TQAConnection:parse_upload_simple_data_input',
+                                                                 'metaItem data must have id and value fields')
 
 
 
@@ -353,42 +372,42 @@ def finalize_report(schedule_id):
         headers = get_standard_headers()
         url_ext = ''.join(['/schedules/',str(schedule_id),'/finalize-results'])
         url_process = ''.join([base_url,url_ext])
-        return requests.post( url_process, headers=headers, data = {})        
+        return requests.post( url_process, headers=headers, data = {})
 
 def get_upload_status(schedule_id):
         return get_request(''.join(['/schedules/',str(schedule_id),'/upload-images']))
-        
+
 
 def get_reports(**kwargs):
         param_keys = ['machine','site','schedule','status','toleranceStatus',
         'deviceType','frequency']
-        
+
         param = {}
         for p in param_keys:
                 param[p] = -1
-        
+
         param.update(**kwargs)
-        
+
         #build the filter
         filter = ''
-        
-        for p in param_keys:       
+
+        for p in param_keys:
 
                 if not param[p] == -1:
-                        if len(filter) > 0: 
+                        if len(filter) > 0:
                                 filter += '&'
                         filter += "{}={}".format(p,str(param[p]))
 
-        
+
         if len(filter) > 0: filter = '?{}'.format(filter)
-        
+
         url_ext = "/reports{}".format(filter)
-        
+
         #get the initial report response
         reports = [];
         rep_response = get_request(url_ext)
         rep_json = rep_response["json"]
-        
+
         if "reports" in rep_json.keys() and len(rep_json["reports"]) > 0:
                 reports.extend(rep_json["reports"])
                 #now see if there are further pages
@@ -401,8 +420,7 @@ def get_reports(**kwargs):
                         rep_json = rep_response["json"]
                         if "reports" in rep_json.keys() and len(rep_json["reports"]) > 0:
                                 reports.extend(rep_json["reports"])
-                
-        
+
+
         return reports
-        
-        
+

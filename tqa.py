@@ -258,7 +258,6 @@ def get_report_data(report_id):
         return get_request('/report-data/'+str(report_id))
 
 
-
 def get_longitudinal_data(schedule_id, variable_ids = -1, date_start = -1, date_end = -1, date_format = -1):
         params = ''
         if variable_ids != -1:
@@ -275,13 +274,13 @@ def get_longitudinal_data(schedule_id, variable_ids = -1, date_start = -1, date_
         if date_start != -1:
                 if len(params) > 0:
                         params += '&'
-                dStart = getDateFromString(date_start, date_format)
+                dStart = get_date_from_string(date_start, date_format)
                 params = params + 'dateFrom=' + str(dStart)
 
         if date_end != -1:
                 if len(params) > 0:
                         params += '&'
-                dEnd = getDateFromString(date_end, date_format)
+                dEnd = get_date_from_string(date_end, date_format)
                 params = params + 'dateTo=' + str(dEnd)
 
         if len(params) > 0:
@@ -292,7 +291,7 @@ def get_longitudinal_data(schedule_id, variable_ids = -1, date_start = -1, date_
         return get_request(url_ext)
 
 
-def getDateFromString(date_str, date_format = -1):
+def get_date_from_string(date_str, date_format = -1):
         if date_format == -1:
                 # no format specified
                 dt = parser.parse(date_str)
@@ -301,6 +300,40 @@ def getDateFromString(date_str, date_format = -1):
 
         dt = dt.strftime('%Y-%m-%dT%H:%M')
         return dt
+
+
+def upload_test_results(schedule_id, variable_data, comment = -1, finalize = -1, date = -1, date_format = -1):
+        # upload test results to a schedule
+        format, schedule_id, output_data = parse_upload_simple_data_input(schedule_id, variable_data, comment,
+                                                                          finalize, date, date_format)
+
+        urlExt = '/schedules/'+str(schedule_id)+'/add-results'
+
+        return requests.post(urlExt, jsonData, format)
+
+
+def parse_upload_simple_data_input(schedule_id, variable_data, comment, finalize, date, date_format):
+        if isinstance(variable_data, dict): # then assume its a single measurement
+                variable_data = [variable_data]
+
+        if len(variable_data) == 0:
+                variable_data = ['EMPTY']
+
+        if not (isinstance(schedule_id, int) and schedule_id > 0):
+                raise ValueError('The schedule id given was not a positive integer.')
+        if not (isinstance(variable_data, dict) or isinstance(variable_data, list)):
+                raise ValueError('The variable data given was not in the form of a dictionary or python list.')
+        if not isinstance(comment, str):
+                raise ValueError('The comment given was not in the form of a string.')
+        if not isinstance(finalize, int):
+                raise ValueError('The finalize input given was not an integer.')
+        elif finalize != 0 or finalize != 1:
+                raise ValueError('The finalize input given was not a 0 or a 1.')
+        if not (isinstance(date, datetime) or isinstance(date, str)):
+                raise ValueError('The date given was not in the form of a datetime or string.')
+        if not isinstance(date_format, str):
+                raise ValueError('The date format given was not in the form of a string.')
+
 
 
 def upload_analysis_file(schedule_id,file_path):

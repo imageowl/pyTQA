@@ -41,7 +41,6 @@ def set_tqa_token():
         token_exp_time = datetime.datetime.now()+datetime.timedelta(seconds=token_duration)
 
 
-
 def load_json_credentials(credential_file):
         with open(credential_file) as cred_file:
                 cred = json.load(cred_file)
@@ -61,6 +60,7 @@ def load_json_credentials(credential_file):
                 client_key = key_bytes.decode('UTF-8')
 
                 set_tqa_token()
+
 
 def save_json_credentials(credential_file):
     #encode the key in base 64
@@ -95,6 +95,7 @@ def get_standard_headers():
             'accept': "application/json",
         }
         return headers
+
 
 def get_request(url_ext, raw_url = False):
         if raw_url:
@@ -302,21 +303,24 @@ def get_date_from_string(date_str, date_format = -1):
         return dt
 
 
-def upload_test_results(schedule_id, variable_data, comment = -1, finalize = -1, date = -1, date_format = -1):
+def upload_test_results(schedule_id, variable_data, comment='', finalize=0, mode='save_append', date=-1, date_format=-1):
         # upload test results to a schedule
-        dt_format, schedule_id, output_data = parse_upload_simple_data_input(schedule_id, variable_data, comment,
-                                                                               finalize, date, date_format)
-        output_dict = {'comment': comment, 'finalize': finalize, 'variables': output_data}
+        output_data = parse_upload_simple_data_input(schedule_id, variable_data, comment, finalize, mode,
+                                                     date, date_format)
+
         headers = get_standard_headers()
         url_ext = ''.join(['/schedules/', str(schedule_id), '/add-results'])
         url_process = ''.join([base_url, url_ext])
-        json_data = json.dumps(output_dict)
+        json_data = json.dumps(output_data)
+        print(json_data)
         return requests.post(url_process, headers=headers, data=json_data)
 
 
-def parse_upload_simple_data_input(schedule_id, variable_data, comment, finalize, date, date_format):
-        # if isinstance(variable_data, dict):  # then assume its a single measurement
-        #         variable_data = [variable_data]
+def parse_upload_simple_data_input(schedule_id, variable_data, comment, finalize, mode, date, date_format):
+        output_dict = {'comment': comment, 'finalize': finalize, 'mode': mode}
+
+        if isinstance(variable_data, dict):  # then assume its a single measurement
+                variable_data = [variable_data]
 
         if len(variable_data) == 0:
                 variable_data = ['EMPTY']
@@ -327,9 +331,9 @@ def parse_upload_simple_data_input(schedule_id, variable_data, comment, finalize
                         dt = parser.parse(date)
                 else:
                         dt = datetime.datetime.strptime(date, date_format)
-                dt = dt.strftime('%Y-%m-%dT%H:%M')
-        else:
-                dt = ''
+                dt = dt.strftime('%Y-%m-%d %H:%M')
+                output_dict['date'] = dt
+
 
         for v in variable_data:
 
@@ -352,7 +356,10 @@ def parse_upload_simple_data_input(schedule_id, variable_data, comment, finalize
                                         if 'id' not in m or 'value' not in m:
                                                 raise ValueError('TQAConnection:parse_upload_simple_data_input',
                                                                  'metaItem data must have id and value fields')
-        return dt, schedule_id, variable_data
+
+        output_dict['variables'] = variable_data
+
+        return output_dict
 
 
 def upload_analysis_file(schedule_id,file_path):

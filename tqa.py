@@ -306,11 +306,12 @@ def upload_test_results(schedule_id, variable_data, comment = -1, finalize = -1,
         # upload test results to a schedule
         dt_format, schedule_id, output_data = parse_upload_simple_data_input(schedule_id, variable_data, comment,
                                                                                finalize, date, date_format)
-
-        urlExt = '/schedules/'+str(schedule_id)+'/add-results'
-        url = base_url + urlExt
-        jsonData = json.dumps(output_data)
-        return requests.post(url, data=jsonData)
+        output_dict = {'comment': comment, 'finalize': finalize, 'variables': output_data}
+        headers = get_standard_headers()
+        url_ext = ''.join(['/schedules/', str(schedule_id), '/add-results'])
+        url_process = ''.join([base_url, url_ext])
+        json_data = json.dumps(output_dict)
+        return requests.post(url_process, headers=headers, data=json_data)
 
 
 def parse_upload_simple_data_input(schedule_id, variable_data, comment, finalize, date, date_format):
@@ -330,11 +331,8 @@ def parse_upload_simple_data_input(schedule_id, variable_data, comment, finalize
         else:
                 dt = ''
 
-        for v in variable_data.values():
-                print(variable_data)
-                print('\n')
-                print(v[0])
-                v = v[0]
+        for v in variable_data:
+
                 # all must have at least id and value
                 if 'id' not in v or 'value' not in v:
                         raise ValueError('TQAConnection:parse_upload_simple_data_input',

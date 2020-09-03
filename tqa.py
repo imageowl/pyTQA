@@ -313,7 +313,7 @@ def upload_test_results(schedule_id, variable_data, comment='', finalize=0, mode
         url_process = ''.join([base_url, url_ext])
         json_data = json.dumps(output_data)
         print(json_data)
-        return requests.post(url_process, headers=headers, data=json_data)
+        # return requests.post(url_process, headers=headers, data=json_data)
 
 
 def parse_upload_simple_data_input(schedule_id, variable_data, comment, finalize, mode, date, date_format):
@@ -337,7 +337,9 @@ def parse_upload_simple_data_input(schedule_id, variable_data, comment, finalize
         report_date = dt.strftime('%Y-%m-%d %H:%M')
 
         for v in variable_data:
-
+                if not isinstance(v, dict):
+                        raise ValueError('TQAConnection:parse_upload_simple_data_input',
+                                   'variable data must be a python list of dictionaries')
                 # all must have at least id and value
                 if 'id' not in v or 'value' not in v:
                         raise ValueError('TQAConnection:parse_upload_simple_data_input',
@@ -350,6 +352,9 @@ def parse_upload_simple_data_input(schedule_id, variable_data, comment, finalize
                                 if 'id' not in v['metaItems'] or 'value' not in v['metaItems']:
                                         raise ValueError('TQAConnection:parse_upload_simple_data_input',
                                                          'metaItem data must have id and value fields')
+                                else:
+                                        variables_dict = v['metaItems']
+                                        v['metaItems'] = [variables_dict]
                         elif isinstance(v['metaItems'], list):
                                 for m in v['metaItems']:
                                         # all must have at least id and value

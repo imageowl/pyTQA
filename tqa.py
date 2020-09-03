@@ -305,7 +305,7 @@ def get_date_from_string(date_str, date_format = -1):
 
 def upload_test_results(schedule_id, variable_data, comment='', finalize=0, mode='save_append', date=-1, date_format=-1):
         # upload test results to a schedule
-        output_data = parse_upload_simple_data_input(schedule_id, variable_data, comment, finalize, mode,
+        output_data = parse_upload_simple_data_input(variable_data, comment, finalize, mode,
                                                      date, date_format)
 
         headers = get_standard_headers()
@@ -313,10 +313,10 @@ def upload_test_results(schedule_id, variable_data, comment='', finalize=0, mode
         url_process = ''.join([base_url, url_ext])
         json_data = json.dumps(output_data)
         print(json_data)
-        # return requests.post(url_process, headers=headers, data=json_data)
+        return requests.post(url_process, headers=headers, data=json_data)
 
 
-def parse_upload_simple_data_input(schedule_id, variable_data, comment, finalize, mode, date, date_format):
+def parse_upload_simple_data_input(variable_data, comment, finalize, mode, date, date_format):
 
         if isinstance(variable_data, dict):  # then assume its a single measurement
                 variable_data = [variable_data]
@@ -348,16 +348,17 @@ def parse_upload_simple_data_input(schedule_id, variable_data, comment, finalize
                 # they MAY have a metaItems field in which case each metaItem must have an id and value
                 if 'metaItems' in v:
                         if isinstance(v['metaItems'], dict):
-                                # all must have at least id and value
+                                # all metaItems must have at least id and value
                                 if 'id' not in v['metaItems'] or 'value' not in v['metaItems']:
                                         raise ValueError('TQAConnection:parse_upload_simple_data_input',
                                                          'metaItem data must have id and value fields')
                                 else:
+                                        # metaItems must be stored in a python list
                                         variables_dict = v['metaItems']
                                         v['metaItems'] = [variables_dict]
                         elif isinstance(v['metaItems'], list):
                                 for m in v['metaItems']:
-                                        # all must have at least id and value
+                                        # all metaItems must have at least id and value
                                         if 'id' not in m or 'value' not in m:
                                                 raise ValueError('TQAConnection:parse_upload_simple_data_input',
                                                                  'metaItem data must have id and value fields')

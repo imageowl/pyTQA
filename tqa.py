@@ -317,7 +317,6 @@ def upload_test_results(schedule_id, variable_data, comment='', finalize=0, mode
 
 
 def parse_upload_simple_data_input(schedule_id, variable_data, comment, finalize, mode, date, date_format):
-        output_dict = {'comment': comment, 'finalize': finalize, 'mode': mode}
 
         if isinstance(variable_data, dict):  # then assume its a single measurement
                 variable_data = [variable_data]
@@ -326,14 +325,16 @@ def parse_upload_simple_data_input(schedule_id, variable_data, comment, finalize
                 variable_data = ['EMPTY']
 
         if date != -1:
-                if date_format == -1:
+                if date_format != -1:
+                        dt = datetime.datetime.strptime(date, date_format)
+                else:
                         # no format specified
                         dt = parser.parse(date)
-                else:
-                        dt = datetime.datetime.strptime(date, date_format)
-                dt = dt.strftime('%Y-%m-%d %H:%M')
-                output_dict['date'] = dt
+        else:
+                # no date specified, default to current date and time
+                dt = datetime.datetime.now()
 
+        report_date = dt.strftime('%Y-%m-%d %H:%M')
 
         for v in variable_data:
 
@@ -342,14 +343,13 @@ def parse_upload_simple_data_input(schedule_id, variable_data, comment, finalize
                         raise ValueError('TQAConnection:parse_upload_simple_data_input',
                                          'each element of the variable data must have id and value fields')
 
-                # they MAY have a metaItems field in which case each metaitem must have an id and value
+                # they MAY have a metaItems field in which case each metaItem must have an id and value
                 if 'metaItems' in v:
                         if isinstance(v['metaItems'], dict):
                                 # all must have at least id and value
                                 if 'id' not in v['metaItems'] or 'value' not in v['metaItems']:
                                         raise ValueError('TQAConnection:parse_upload_simple_data_input',
                                                          'metaItem data must have id and value fields')
-                                # if len(v['metaItems']) == 1:
                         elif isinstance(v['metaItems'], list):
                                 for m in v['metaItems']:
                                         # all must have at least id and value
@@ -357,7 +357,8 @@ def parse_upload_simple_data_input(schedule_id, variable_data, comment, finalize
                                                 raise ValueError('TQAConnection:parse_upload_simple_data_input',
                                                                  'metaItem data must have id and value fields')
 
-        output_dict['variables'] = variable_data
+        output_dict = {'date': report_date, 'comment': comment, 'finalize': finalize, 'mode': mode,
+                       'variables': variable_data}
 
         return output_dict
 

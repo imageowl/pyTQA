@@ -1,4 +1,5 @@
 #TQA : Module for Connecting to Total QA API
+import mimetypes
 
 import requests
 import json
@@ -367,6 +368,22 @@ def parse_upload_simple_data_input(variable_data, comment, finalize, mode, date,
                        'variables': variable_data}
 
         return output_dict
+
+
+def encode_file_attachment_for_upload(filepath):
+        file = open(filepath, 'rb').read()
+        result = base64.b64encode(file).decode('ascii')
+
+        source = mimetypes.guess_type(filepath)
+        if source == (None, None):
+                source = 'application/unknown'
+        else:
+                source = str(source[0])
+        print(source)
+
+        value = 'data:' + source + ';base64,' + result
+        print(value)
+        return value
 
 
 def upload_analysis_file(schedule_id,file_path):

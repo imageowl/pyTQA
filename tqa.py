@@ -370,19 +370,17 @@ def parse_upload_simple_data_input(variable_data, comment, finalize, mode, date,
         return output_dict
 
 
-def encode_file_attachment_for_upload(filepath):
-        file = open(filepath, 'rb').read()
+def encode_file_attachment_for_upload(file_path):
+        file = open(file_path, 'rb').read()
         result = base64.b64encode(file).decode('ascii')
 
-        source = mimetypes.guess_type(filepath)
-        if source == (None, None):
-                source = 'application/unknown'
+        content_type = mimetypes.guess_type(file_path)
+        if content_type == (None, None):
+                content_type = 'application/unknown'
         else:
-                source = str(source[0])
-        print(source)
+                content_type = str(content_type[0])
 
-        value = 'data:' + source + ';base64,' + result
-        print(value)
+        value = 'data:' + content_type + ';base64,' + result
         return value
 
 

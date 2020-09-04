@@ -374,11 +374,7 @@ def encode_file_attachment_for_upload(file_path):
         file = open(file_path, 'rb').read()
         result = base64.b64encode(file).decode('ascii')
 
-        content_type = mimetypes.guess_type(file_path)
-        if content_type == (None, None):
-                content_type = 'application/unknown'
-        else:
-                content_type = str(content_type[0])
+        content_type = 'application/unknown'
 
         value = 'data:' + content_type + ';base64,' + result
         return value

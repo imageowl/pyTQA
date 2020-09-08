@@ -296,11 +296,11 @@ def get_longitudinal_data(schedule_id, variable_ids=-1, date_start=-1, date_end=
 
 
 def get_date_from_string(date_str, date_format=-1):
-        if date_format == -1:
+        if date_format != -1:
+                dt = datetime.datetime.strptime(date_str, date_format)
+        else:
                 # no format specified
                 dt = parser.parse(date_str)
-        else:
-                dt = datetime.datetime.strptime(date_str, date_format)
 
         dt = dt.strftime('%Y-%m-%dT%H:%M')
         return dt

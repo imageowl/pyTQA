@@ -260,30 +260,32 @@ def get_report_data(report_id):
         return get_request('/report-data/'+str(report_id))
 
 
-def get_longitudinal_data(schedule_id, variable_ids = -1, date_start = -1, date_end = -1, date_format = -1):
+def get_longitudinal_data(schedule_id, variable_ids=-1, date_start=-1, date_end=-1, date_format=-1):
+        # build the filter
         params = ''
         if variable_ids != -1:
-                if isinstance(variable_ids, int) == 1:
+                if isinstance(variable_ids, int):
                         params = params + 'variables=' + str(variable_ids)
-                elif len(variable_ids) == 1:
-                        params = params + 'variables=' + str(variable_ids[0])
-                else:
-                        params += 'variables='
-                        for v in variable_ids:
-                                params = params + str(v) + ','
-                        params = params[:-1]
+                elif isinstance(variable_ids, list):
+                        if len(variable_ids) == 1:
+                                params = params + 'variables=' + str(variable_ids[0])
+                        else:
+                                params += 'variables='
+                                for v in variable_ids:
+                                        params = params + str(v) + ','
+                                params = params[:-1]
 
         if date_start != -1:
                 if len(params) > 0:
                         params += '&'
-                dStart = get_date_from_string(date_start, date_format)
-                params = params + 'dateFrom=' + str(dStart)
+                date_from = get_date_from_string(date_start, date_format)
+                params = params + 'dateFrom=' + str(date_from)
 
         if date_end != -1:
                 if len(params) > 0:
                         params += '&'
-                dEnd = get_date_from_string(date_end, date_format)
-                params = params + 'dateTo=' + str(dEnd)
+                date_to = get_date_from_string(date_end, date_format)
+                params = params + 'dateTo=' + str(date_to)
 
         if len(params) > 0:
                 params = '?' + params
@@ -293,7 +295,7 @@ def get_longitudinal_data(schedule_id, variable_ids = -1, date_start = -1, date_
         return get_request(url_ext)
 
 
-def get_date_from_string(date_str, date_format = -1):
+def get_date_from_string(date_str, date_format=-1):
         if date_format == -1:
                 # no format specified
                 dt = parser.parse(date_str)
@@ -313,7 +315,6 @@ def upload_test_results(schedule_id, variable_data, comment='', finalize=0, mode
         url_ext = ''.join(['/schedules/', str(schedule_id), '/add-results'])
         url_process = ''.join([base_url, url_ext])
         json_data = json.dumps(output_data)
-        print(json_data)
         return requests.post(url_process, headers=headers, data=json_data)
 
 

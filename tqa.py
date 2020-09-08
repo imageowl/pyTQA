@@ -308,8 +308,7 @@ def get_date_from_string(date_str, date_format=-1):
 
 def upload_test_results(schedule_id, variable_data, comment='', finalize=0, mode='save_append', date=-1, date_format=-1):
         # upload test results to a schedule
-        output_data = parse_upload_simple_data_input(variable_data, comment, finalize, mode,
-                                                     date, date_format)
+        output_data = parse_upload_simple_data_input(variable_data, comment, finalize, mode, date, date_format)
 
         headers = get_standard_headers()
         url_ext = ''.join(['/schedules/', str(schedule_id), '/add-results'])
@@ -338,10 +337,11 @@ def parse_upload_simple_data_input(variable_data, comment, finalize, mode, date,
 
         report_date = dt.strftime('%Y-%m-%d %H:%M')
 
+        # check format of variable data input
         for v in variable_data:
                 if not isinstance(v, dict):
                         raise ValueError('TQAConnection:parse_upload_simple_data_input',
-                                   'variable data must be a python list of dictionaries')
+                                         'variable data must be a python list of dictionaries')
                 # all must have at least id and value
                 if 'id' not in v or 'value' not in v:
                         raise ValueError('TQAConnection:parse_upload_simple_data_input',

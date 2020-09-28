@@ -184,7 +184,7 @@ def get_schedules(schedule_id = -1):
                 return get_request('/schedules/'+str(schedule_id))
 
 
-def get_schedule_id_from_str(schedule_name, machine_idx = -1):
+def get_schedule_id_from_string(schedule_name, machine_idx = -1):
         if machine_idx == -1:
                 raise Warning('Possible_Ambiguous_Results', 'Not specifying a machine id may result in'
                                                             'ambiguous results')

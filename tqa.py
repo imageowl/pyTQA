@@ -314,7 +314,10 @@ def upload_test_results(schedule_id, variable_data, comment='', finalize=0, mode
         url_ext = ''.join(['/schedules/', str(schedule_id), '/add-results'])
         url_process = ''.join([base_url, url_ext])
         json_data = json.dumps(output_data)
-        return requests.post(url_process, headers=headers, data=json_data)
+        response = requests.post(url_process, headers=headers, data=json_data)
+        return {'json': response.json(),
+                'status': response.status_code,
+                'raw': response}
 
 
 def parse_upload_simple_data_input(variable_data, comment, finalize, mode, date, date_format):

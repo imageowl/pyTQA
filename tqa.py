@@ -384,16 +384,22 @@ def encode_file_attachment_for_upload(file_path):
         return value
 
 
-def upload_analysis_file(schedule_id,file_path):
+def upload_analysis_file(schedule_id,file_path,analysisType = None):
         headers = get_standard_headers()
         #remove the content-type for this call
         del headers['content-type']
         url_ext = ''.join(['/schedules/',str(schedule_id),'/upload-images'])
         url = ''.join([base_url,url_ext])
         files = [
-            ('file',(file_path,open(file_path,'rb'),'application/octet-stream'))
-            ]
-        return requests.post( url, headers=headers, data = {}, files = files)
+                ('file',(file_path,open(file_path,'rb'),'application/octet-stream'))
+                ]
+        if analysisType is None:
+            payload = {}
+        else:
+            print(analysisType)
+            payload = {'analysisType': str(analysisType)}
+            
+        return requests.post( url, headers=headers, data = payload, files = files)
 
 def start_processing(schedule_id):
         headers = get_standard_headers()

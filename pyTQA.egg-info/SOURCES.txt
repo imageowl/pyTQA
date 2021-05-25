@@ -1,0 +1,9 @@
+LICENSE
+README.md
+pyproject.toml
+setup.py
+pyTQA.egg-info/PKG-INFO
+pyTQA.egg-info/SOURCES.txt
+pyTQA.egg-info/dependency_links.txt
+pyTQA.egg-info/requires.txt
+pyTQA.egg-info/top_level.txt

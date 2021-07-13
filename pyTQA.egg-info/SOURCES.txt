@@ -7,3 +7,5 @@ pyTQA.egg-info/SOURCES.txt
 pyTQA.egg-info/dependency_links.txt
 pyTQA.egg-info/requires.txt
 pyTQA.egg-info/top_level.txt
+src/__init__.py
+src/tqa.py

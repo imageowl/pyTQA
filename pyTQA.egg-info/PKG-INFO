@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: pyTQA
-Version: 1.0.0
+Version: 1.0.2
 Summary: Python Wrapper for the Image Owl Total QA
 Home-page: https://github.com/imageowl/pyTQA.git
 Author: Matt Whitaker
@@ -8,8 +8,8 @@ Author-email: whitaker@imageowl.com
 License: UNKNOWN
 Platform: UNKNOWN
 Classifier: License :: OSI Approved :: MIT License
-Classifier: Programming Language :: Python :: 3.8
-Requires-Python: >=3.8.5
+Classifier: Programming Language :: Python :: 3.6
+Requires-Python: >=3.6
 License-File: LICENSE
 
 # pyTQA

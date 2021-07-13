@@ -204,7 +204,7 @@ def get_schedule_id_from_string(schedule_name, machine_idx = -1):
         for idx, val in enumerate(schedules['json']['schedules']):
                 machine = schedules['json']['schedules'][idx]['machineId']
                 sched = schedules['json']['schedules'][idx]['id']
-                if machine == machine_idx and sched in res_ids:
+                if machine == machine_idx and sched in res_ids and schedule_names[idx] in schedule_name:
                         return sched
         return 'No schedules found with that id for specified machine id'
 

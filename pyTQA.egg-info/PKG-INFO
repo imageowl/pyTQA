@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: pyTQA
-Version: 1.0.2
+Version: 1.0.4
 Summary: Python Wrapper for the Image Owl Total QA
 Home-page: https://github.com/imageowl/pyTQA.git
 Author: Matt Whitaker

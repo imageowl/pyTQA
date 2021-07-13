@@ -2,6 +2,8 @@ LICENSE
 README.md
 pyproject.toml
 setup.py
+pyTQA/__init__.py
+pyTQA/tqa.py
 pyTQA.egg-info/PKG-INFO
 pyTQA.egg-info/SOURCES.txt
 pyTQA.egg-info/dependency_links.txt
